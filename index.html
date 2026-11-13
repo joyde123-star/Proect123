@@ -1,0 +1,1019 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Убери Телефон!</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Nunito:wght@400;700;900&display=swap">
+
+<style>
+/* === DESIGN TOKENS === */
+/* Layout: full-screen canvas game, portrait phone */
+:root {
+  --bg: #0d0d1a;
+  --bg2: #161628;
+  --panel: #1e1e38;
+  --border: #2e2e55;
+  --fg: #f0f0ff;
+  --fg2: #9090bb;
+  --accent: #ff4d6d;
+  --accent2: #ff8fa3;
+  --gold: #ffd700;
+  --green: #4cff91;
+  --blue: #4d9fff;
+  --purple: #c77dff;
+  color-scheme: dark;
+}
+/* single dark theme — this is a neon arcade screen */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Nunito', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+/* ========== SCREENS ========== */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-left: max(16px, env(safe-area-inset-left,0px));
+  padding-right: max(16px, env(safe-area-inset-right,0px));
+  padding-block: max(20px, env(safe-area-inset-top,0px)) max(20px, env(safe-area-inset-bottom,0px));
+  transition: opacity .3s;
+  overflow: hidden;
+}
+.screen[hidden] { display: none !important; }
+
+/* ========== MENU ========== */
+#screen-menu {
+  background: radial-gradient(ellipse at 50% 30%, #1a0a2e 0%, var(--bg) 70%);
+  gap: 0;
+}
+
+.menu-glow {
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,77,109,.18) 0%, transparent 70%);
+  top: 5%; left: 50%; transform: translateX(-50%);
+  pointer-events: none;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%,100% { opacity: .6; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.15); }
+}
+
+.menu-title {
+  font-family: 'Russo One', sans-serif;
+  font-size: clamp(2rem, 10vw, 3.2rem);
+  color: var(--accent);
+  text-align: center;
+  text-wrap: balance;
+  line-height: 1.1;
+  text-shadow: 0 0 30px rgba(255,77,109,.7), 0 0 60px rgba(255,77,109,.3);
+  margin-top: 20px;
+  letter-spacing: 1px;
+}
+.menu-subtitle {
+  font-size: .9rem;
+  color: var(--fg2);
+  margin-top: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.menu-phone-anim {
+  font-size: 90px;
+  margin: 24px 0 16px;
+  animation: shake-phone 1.4s ease-in-out infinite;
+  display: block;
+  text-align: center;
+  filter: drop-shadow(0 0 16px rgba(255,77,109,.5));
+}
+@keyframes shake-phone {
+  0%,100% { transform: rotate(-10deg) scale(1); }
+  20% { transform: rotate(12deg) scale(1.05); }
+  40% { transform: rotate(-8deg) scale(1); }
+  60% { transform: rotate(10deg) scale(1.03); }
+  80% { transform: rotate(-5deg) scale(1); }
+}
+
+.menu-girl-preview {
+  font-size: 54px;
+  position: absolute;
+  right: 12%;
+  bottom: 22%;
+  animation: float-girl 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.5));
+}
+@keyframes float-girl {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  padding: 16px 24px;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Russo One', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform .12s, box-shadow .12s;
+  outline: none;
+}
+.btn:active { transform: scale(.96); }
+
+.btn-play {
+  background: linear-gradient(135deg, var(--accent), #c0392b);
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(255,77,109,.5);
+  margin-top: 8px;
+}
+.btn-play:hover { box-shadow: 0 6px 32px rgba(255,77,109,.7); }
+
+.btn-upgrade {
+  background: linear-gradient(135deg, var(--gold), #e67e00);
+  color: #1a0a00;
+  box-shadow: 0 4px 20px rgba(255,215,0,.35);
+  margin-top: 12px;
+}
+.btn-upgrade:hover { box-shadow: 0 6px 28px rgba(255,215,0,.55); }
+
+.btn-secondary {
+  background: var(--panel);
+  color: var(--fg);
+  border: 1.5px solid var(--border);
+  margin-top: 10px;
+  font-size: .95rem;
+}
+
+.menu-stats {
+  margin-top: 20px;
+  display: flex;
+  gap: 24px;
+  font-size: .85rem;
+  color: var(--fg2);
+}
+.menu-stats span { display: flex; align-items: center; gap: 5px; }
+.menu-stats strong { color: var(--gold); font-variant-numeric: tabular-nums; }
+
+/* ========== UPGRADE ========== */
+#screen-upgrade {
+  background: var(--bg);
+  overflow-y: auto;
+  justify-content: flex-start;
+  padding-top: max(60px, env(safe-area-inset-top, 0px));
+}
+.upgrade-header {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-left: 4px;
+}
+.upgrade-header h2 {
+  font-family: 'Russo One', sans-serif;
+  font-size: 1.5rem;
+  color: var(--gold);
+  text-shadow: 0 0 12px rgba(255,215,0,.4);
+}
+.btn-back {
+  background: var(--panel);
+  border: 1.5px solid var(--border);
+  color: var(--fg);
+  border-radius: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.coins-display {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: .9rem;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.upgrade-grid {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 24px;
+}
+.upgrade-card {
+  background: var(--panel);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  gap: 0 12px;
+  align-items: center;
+}
+.upgrade-card.maxed { opacity: .6; }
+.upgrade-icon { font-size: 2.2rem; text-align: center; }
+.upgrade-info { min-width: 0; }
+.upgrade-name {
+  font-weight: 900;
+  font-size: .95rem;
+  color: var(--fg);
+}
+.upgrade-desc {
+  font-size: .78rem;
+  color: var(--fg2);
+  margin-top: 2px;
+}
+.upgrade-bar-wrap {
+  margin-top: 7px;
+  height: 6px;
+  background: var(--bg2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.upgrade-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+  border-radius: 99px;
+  transition: width .4s;
+}
+.btn-buy {
+  background: linear-gradient(135deg, var(--gold), #e67e00);
+  color: #1a0a00;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: 'Russo One', sans-serif;
+  font-size: .78rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .12s, opacity .12s;
+}
+.btn-buy:disabled { opacity: .4; cursor: default; }
+.btn-buy:not(:disabled):active { transform: scale(.93); }
+.level-badge {
+  font-size: .7rem;
+  color: var(--fg2);
+  margin-top: 3px;
+}
+
+/* ========== GAME ========== */
+#screen-game {
+  background: var(--bg);
+  padding: 0;
+  justify-content: flex-start;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* HUD overlay */
+.hud {
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top, 0px));
+  left: max(12px, env(safe-area-inset-left, 0px));
+  right: max(12px, env(safe-area-inset-right, 0px));
+  pointer-events: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  z-index: 10;
+}
+.hud-box {
+  background: rgba(13,13,26,.75);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: .8rem;
+  color: var(--fg2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  backdrop-filter: blur(4px);
+}
+.hud-box strong { color: var(--fg); font-variant-numeric: tabular-nums; }
+.hud-box.hp strong { color: var(--accent); }
+.hud-box.coins strong { color: var(--gold); }
+.hud-pause {
+  margin-left: auto;
+  pointer-events: all;
+  cursor: pointer;
+  background: rgba(13,13,26,.75);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 5px 11px;
+  font-size: 1.1rem;
+  backdrop-filter: blur(4px);
+  color: var(--fg);
+}
+
+/* Game over / pause overlay */
+.game-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 20;
+  backdrop-filter: blur(6px);
+  padding: 20px;
+}
+.game-overlay[hidden] { display: none !important; }
+.overlay-title {
+  font-family: 'Russo One', sans-serif;
+  font-size: 2rem;
+  color: var(--accent);
+  text-shadow: 0 0 20px rgba(255,77,109,.6);
+  text-wrap: balance;
+  text-align: center;
+}
+.overlay-score {
+  font-size: 1rem;
+  color: var(--fg2);
+  text-align: center;
+}
+.overlay-score strong { color: var(--gold); }
+</style>
+
+<!-- MENU SCREEN -->
+<div id="screen-menu" class="screen">
+  <div class="menu-glow"></div>
+  <div class="menu-girl-preview">👩</div>
+  <span class="menu-phone-anim">📱</span>
+  <h1 class="menu-title">УБЕРИ<br>ТЕЛЕФОН!</h1>
+  <p class="menu-subtitle">2D Экшн — Прокачка</p>
+  <div class="menu-stats">
+    <span>🪙 <strong id="menu-coins">0</strong></span>
+    <span>🏆 <strong id="menu-best">0</strong></span>
+  </div>
+  <button class="btn btn-play" id="btn-play">▶ ИГРАТЬ</button>
+  <button class="btn btn-upgrade" id="btn-open-upgrade">⚡ ПРОКАЧКА</button>
+  <button class="btn btn-secondary" id="btn-howto">❓ Как играть</button>
+</div>
+
+<!-- UPGRADE SCREEN -->
+<div id="screen-upgrade" class="screen" hidden>
+  <div class="upgrade-header">
+    <button class="btn-back" id="btn-back-upgrade">← Назад</button>
+    <h2>⚡ Прокачка</h2>
+    <div class="coins-display">🪙 <span id="upg-coins">0</span></div>
+  </div>
+  <div class="upgrade-grid" id="upgrade-grid"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="screen-game" class="screen" hidden>
+  <canvas id="gameCanvas"></canvas>
+  <div class="hud">
+    <div class="hud-box hp">❤️ <strong id="hud-hp">100</strong></div>
+    <div class="hud-box">⭐ <strong id="hud-score">0</strong></div>
+    <div class="hud-box coins">🪙 <strong id="hud-coins">0</strong></div>
+    <button class="hud-pause" id="btn-pause">⏸</button>
+  </div>
+  <div class="game-overlay" id="overlay-pause" hidden>
+    <div class="overlay-title">⏸ Пауза</div>
+    <button class="btn btn-play" id="btn-resume">▶ Продолжить</button>
+    <button class="btn btn-upgrade" id="btn-upg-ingame">⚡ Прокачка</button>
+    <button class="btn btn-secondary" id="btn-menu-pause">🏠 Меню</button>
+  </div>
+  <div class="game-overlay" id="overlay-gameover" hidden>
+    <div class="overlay-title">💔 КОНЕЦ!</div>
+    <div class="overlay-score" id="go-score">Счёт: <strong>0</strong> | Монет: <strong>0</strong></div>
+    <button class="btn btn-play" id="btn-restart">🔄 Ещё раз</button>
+    <button class="btn btn-upgrade" id="btn-upg-gameover">⚡ Прокачка</button>
+    <button class="btn btn-secondary" id="btn-menu-go">🏠 Меню</button>
+  </div>
+</div>
+
+<script>
+(function() {
+
+// ============================================================
+// STATE
+// ============================================================
+let save = { coins: 0, best: 0, upgrades: { speed: 0, damage: 0, hp: 0, regen: 0, attract: 0, multishot: 0 } };
+try { const s = localStorage.getItem('phaway'); if (s) save = JSON.parse(s); } catch(e){}
+function persist() { try { localStorage.setItem('phaway', JSON.stringify(save)); } catch(e){} }
+
+const UPG_DEFS = [
+  { key: 'speed',     icon: '⚡', name: 'Скорость броска',  desc: 'Телефон летит быстрее',         max: 10, baseCost: 30,  mult: 1.6 },
+  { key: 'damage',    icon: '💥', name: 'Урон',             desc: 'Больше урона за попадание',       max: 10, baseCost: 40,  mult: 1.7 },
+  { key: 'hp',        icon: '❤️', name: 'Здоровье',         desc: 'Максимальное HP девушки',         max: 10, baseCost: 50,  mult: 1.8 },
+  { key: 'regen',     icon: '💊', name: 'Регенерация',      desc: 'Восстановление HP в секунду',    max: 8,  baseCost: 60,  mult: 2.0 },
+  { key: 'attract',   icon: '🧲', name: 'Монетный магнит',  desc: 'Радиус сбора монет больше',      max: 8,  baseCost: 45,  mult: 1.65 },
+  { key: 'multishot', icon: '🔀', name: 'Мультибросок',     desc: 'Дополнительные телефоны',         max: 5,  baseCost: 100, mult: 2.5 },
+];
+
+function upgCost(key) {
+  const d = UPG_DEFS.find(u => u.key === key);
+  const lv = save.upgrades[key] || 0;
+  return Math.round(d.baseCost * Math.pow(d.mult, lv));
+}
+function upgMaxed(key) {
+  const d = UPG_DEFS.find(u => u.key === key);
+  return (save.upgrades[key] || 0) >= d.max;
+}
+
+// ============================================================
+// SCREEN MANAGER
+// ============================================================
+const screens = {
+  menu: document.getElementById('screen-menu'),
+  upgrade: document.getElementById('screen-upgrade'),
+  game: document.getElementById('screen-game'),
+};
+function showScreen(name) {
+  Object.keys(screens).forEach(k => screens[k].hidden = k !== name);
+}
+
+function updateMenuUI() {
+  document.getElementById('menu-coins').textContent = save.coins;
+  document.getElementById('menu-best').textContent = save.best;
+}
+
+// ============================================================
+// UPGRADE SCREEN
+// ============================================================
+function renderUpgradeGrid() {
+  const grid = document.getElementById('upgrade-grid');
+  document.getElementById('upg-coins').textContent = save.coins;
+  grid.innerHTML = '';
+  UPG_DEFS.forEach(def => {
+    const lv = save.upgrades[def.key] || 0;
+    const maxed = lv >= def.max;
+    const cost = upgCost(def.key);
+    const canBuy = !maxed && save.coins >= cost;
+
+    const card = document.createElement('div');
+    card.className = 'upgrade-card' + (maxed ? ' maxed' : '');
+    const pct = (lv / def.max * 100).toFixed(0);
+    card.innerHTML = `
+      <div class="upgrade-icon">${def.icon}</div>
+      <div class="upgrade-info">
+        <div class="upgrade-name">${def.name}</div>
+        <div class="upgrade-desc">${def.desc}</div>
+        <div class="upgrade-bar-wrap"><div class="upgrade-bar" style="width:${pct}%"></div></div>
+        <div class="level-badge">Уровень ${lv}/${def.max}</div>
+      </div>
+      <button class="btn-buy" ${!canBuy ? 'disabled' : ''} data-key="${def.key}">
+        ${maxed ? 'МАКС' : '🪙 ' + cost}
+      </button>`;
+    card.querySelector('.btn-buy')?.addEventListener('click', () => {
+      if (upgMaxed(def.key) || save.coins < upgCost(def.key)) return;
+      save.coins -= upgCost(def.key);
+      save.upgrades[def.key] = (save.upgrades[def.key] || 0) + 1;
+      persist();
+      renderUpgradeGrid();
+    });
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('btn-open-upgrade').addEventListener('click', () => {
+  renderUpgradeGrid(); showScreen('upgrade');
+});
+document.getElementById('btn-back-upgrade').addEventListener('click', () => {
+  updateMenuUI(); showScreen('menu');
+});
+document.getElementById('btn-upg-ingame').addEventListener('click', () => {
+  pauseGame(); renderUpgradeGrid(); showScreen('upgrade');
+});
+document.getElementById('btn-upg-gameover').addEventListener('click', () => {
+  renderUpgradeGrid(); showScreen('upgrade');
+});
+
+// ============================================================
+// HOW TO PLAY
+// ============================================================
+document.getElementById('btn-howto').addEventListener('click', () => {
+  alert('📱 Нажимай на экран, чтобы бросать телефоны в девушку!\n\n👩 Девушка идёт справа — не дай ей добраться до тебя!\n\n🪙 Собирай монеты — прокачивай героя!\n\n⚡ В Прокачке увеличивай урон, скорость и HP.');
+});
+
+// ============================================================
+// GAME ENGINE
+// ============================================================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let game = null;
+let animId = null;
+let paused = false;
+
+function getUpgVal(key, base, perLevel) {
+  return base + (save.upgrades[key] || 0) * perLevel;
+}
+
+function startGame() {
+  paused = false;
+  document.getElementById('overlay-pause').hidden = true;
+  document.getElementById('overlay-gameover').hidden = true;
+  showScreen('game');
+  resizeCanvas();
+
+  const W = canvas.width, H = canvas.height;
+  const maxHP = getUpgVal('hp', 100, 20);
+
+  game = {
+    W, H,
+    score: 0,
+    sessionCoins: 0,
+    hp: maxHP,
+    maxHP,
+    regenAcc: 0,
+    t: 0,
+    projectiles: [],
+    girls: [],
+    coins: [],
+    particles: [],
+    floats: [],
+    // spawn timing
+    girlSpawnTimer: 0,
+    girlSpawnInterval: 240, // frames
+    touch: null,
+    clicks: [],
+  };
+
+  updateHUD();
+  if (animId) cancelAnimationFrame(animId);
+  loop();
+}
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  if (game) { game.W = canvas.width; game.H = canvas.height; }
+}
+window.addEventListener('resize', resizeCanvas);
+
+// Touch/click input
+canvas.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  if (!game || paused) return;
+  game.clicks.push({ x: e.clientX, y: e.clientY });
+});
+
+function pauseGame() {
+  paused = true;
+  document.getElementById('overlay-pause').hidden = false;
+}
+function resumeGame() {
+  paused = false;
+  document.getElementById('overlay-pause').hidden = true;
+  if (animId) cancelAnimationFrame(animId);
+  loop();
+}
+document.getElementById('btn-pause').addEventListener('click', pauseGame);
+document.getElementById('btn-resume').addEventListener('click', resumeGame);
+document.getElementById('btn-menu-pause').addEventListener('click', () => {
+  paused = true; cancelAnimationFrame(animId);
+  updateMenuUI(); showScreen('menu');
+});
+document.getElementById('btn-menu-go').addEventListener('click', () => {
+  updateMenuUI(); showScreen('menu');
+});
+document.getElementById('btn-restart').addEventListener('click', startGame);
+document.getElementById('btn-play').addEventListener('click', startGame);
+
+// ============================================================
+// ENTITIES
+// ============================================================
+class Projectile {
+  constructor(sx, sy, tx, ty) {
+    this.x = sx; this.y = sy;
+    const speed = getUpgVal('speed', 7, 1.2);
+    const dx = tx - sx, dy = ty - sy;
+    const len = Math.hypot(dx, dy) || 1;
+    this.vx = dx / len * speed;
+    this.vy = dy / len * speed;
+    this.r = 18;
+    this.rot = 0;
+    this.alive = true;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    this.rot += 0.3;
+    const { W, H } = game;
+    if (this.x < -50 || this.x > W+50 || this.y < -50 || this.y > H+50) this.alive = false;
+  }
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+    ctx.font = `${this.r * 2}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('📱', 0, 0);
+    ctx.restore();
+  }
+}
+
+const GIRL_STATES = { walk: 'walk', hurt: 'hurt', attack: 'attack', dead: 'dead' };
+class Girl {
+  constructor(H) {
+    this.y = H * 0.52;
+    this.x = game.W + 60;
+    this.hp = getUpgVal('damage', 60, 20) * 2.5; // girl HP scales
+    this.maxHp = this.hp;
+    this.speed = 1.1 + game.score / 2000;
+    this.r = 32;
+    this.state = GIRL_STATES.walk;
+    this.stateTimer = 0;
+    this.alive = true;
+    this.flash = 0;
+    this.frame = 0;
+    this.frameTimer = 0;
+  }
+  update() {
+    this.frameTimer++;
+    if (this.frameTimer > 12) { this.frame = (this.frame+1)%2; this.frameTimer = 0; }
+    if (this.state === GIRL_STATES.hurt) {
+      this.stateTimer--;
+      if (this.stateTimer <= 0) this.state = GIRL_STATES.walk;
+    }
+    if (this.state === GIRL_STATES.walk) {
+      this.x -= this.speed;
+    }
+    if (this.flash > 0) this.flash--;
+    // reached player side
+    if (this.x < 60) {
+      this.state = GIRL_STATES.attack;
+      game.hp -= 0.4;
+      if (game.hp < 0) game.hp = 0;
+    }
+  }
+  hit(dmg) {
+    this.hp -= dmg;
+    this.flash = 8;
+    this.state = GIRL_STATES.hurt;
+    this.stateTimer = 20;
+    if (this.hp <= 0) {
+      this.alive = false;
+      // spawn coins
+      const n = 3 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < n; i++) {
+        game.coins.push(new Coin(this.x + (Math.random()-0.5)*40, this.y + (Math.random()-0.5)*40));
+      }
+      // particles
+      for (let i = 0; i < 20; i++) {
+        game.particles.push(new Particle(this.x, this.y, '#ff4d6d'));
+      }
+      game.score += 100;
+      game.floats.push(new FloatText(this.x, this.y - 40, '+100', '#ffd700'));
+    }
+  }
+  draw() {
+    const { x, y, r, flash, hp, maxHp, state, frame } = this;
+    // HP bar
+    const bw = 60, bh = 7;
+    const pct = hp / maxHp;
+    ctx.fillStyle = 'rgba(0,0,0,.5)';
+    ctx.beginPath(); ctx.roundRect(x - bw/2, y - r - 22, bw, bh, 4); ctx.fill();
+    ctx.fillStyle = pct > 0.5 ? '#4cff91' : pct > 0.25 ? '#ffd700' : '#ff4d6d';
+    ctx.beginPath(); ctx.roundRect(x - bw/2, y - r - 22, bw * pct, bh, 4); ctx.fill();
+
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,.3)';
+    ctx.beginPath(); ctx.ellipse(x, y + r - 4, r * 0.7, 8, 0, 0, Math.PI*2); ctx.fill();
+
+    if (flash > 0) {
+      ctx.save(); ctx.globalAlpha = 0.6;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(x, y, r + 4, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
+    // body
+    const bounce = state === GIRL_STATES.walk ? Math.sin(game.t * 0.18) * 3 : 0;
+    const gy = y + bounce;
+
+    ctx.font = '58px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+
+    if (state === GIRL_STATES.attack) {
+      // arms extended
+      ctx.fillText('👩', x, gy);
+      ctx.font = '24px serif';
+      ctx.fillText(frame === 0 ? '✊' : '👊', x + 44, gy - 10);
+    } else if (state === GIRL_STATES.hurt) {
+      ctx.globalAlpha = 0.9;
+      ctx.fillText('😵', x, gy);
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.fillText('👩', x, gy);
+    }
+
+    // legs walking
+    if (state === GIRL_STATES.walk) {
+      ctx.font = '20px serif';
+      const swing = Math.sin(game.t * 0.22) * 10;
+      ctx.fillText('👟', x - 10 + swing, gy + 6);
+      ctx.fillText('👟', x + 10 - swing, gy + 6);
+    }
+  }
+}
+
+class Coin {
+  constructor(x, y) {
+    this.x = x; this.y = y;
+    this.vx = (Math.random()-.5)*3;
+    this.vy = -Math.random()*4 - 2;
+    this.r = 14;
+    this.alive = true;
+    this.age = 0;
+    this.maxAge = 220;
+  }
+  update() {
+    this.vy += 0.18;
+    this.x += this.vx; this.y += this.vy;
+    this.vx *= 0.97;
+    if (this.y > game.H + 20) this.alive = false;
+    this.age++;
+    if (this.age > this.maxAge) this.alive = false;
+    // attract to player (bottom left area)
+    const px = 50, py = game.H - 100;
+    const attractR = getUpgVal('attract', 80, 25);
+    const dx = px - this.x, dy = py - this.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < attractR) {
+      this.x += dx / dist * 5;
+      this.y += dy / dist * 5;
+      if (dist < 30) {
+        this.alive = false;
+        game.sessionCoins++;
+        save.coins++;
+        game.floats.push(new FloatText(this.x, this.y, '+1🪙', '#ffd700'));
+      }
+    }
+  }
+  draw() {
+    const alpha = this.age > this.maxAge - 40 ? (this.maxAge - this.age) / 40 : 1;
+    ctx.globalAlpha = alpha;
+    ctx.font = `${this.r * 2}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🪙', this.x, this.y);
+    ctx.globalAlpha = 1;
+  }
+}
+
+class Particle {
+  constructor(x, y, color) {
+    this.x = x; this.y = y;
+    this.vx = (Math.random()-.5)*8;
+    this.vy = (Math.random()-.5)*8 - 2;
+    this.color = color;
+    this.r = Math.random()*5+2;
+    this.alpha = 1;
+    this.alive = true;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    this.vy += 0.3;
+    this.alpha -= 0.035;
+    this.r *= 0.97;
+    if (this.alpha <= 0) this.alive = false;
+  }
+  draw() {
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+class FloatText {
+  constructor(x, y, text, color) {
+    this.x = x; this.y = y; this.text = text; this.color = color;
+    this.vy = -2; this.alpha = 1; this.alive = true;
+  }
+  update() {
+    this.y += this.vy;
+    this.vy *= 0.95;
+    this.alpha -= 0.025;
+    if (this.alpha <= 0) this.alive = false;
+  }
+  draw() {
+    ctx.globalAlpha = this.alpha;
+    ctx.font = 'bold 20px Nunito, sans-serif';
+    ctx.fillStyle = this.color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(this.text, this.x, this.y);
+    ctx.globalAlpha = 1;
+  }
+}
+
+// ============================================================
+// GAME LOOP
+// ============================================================
+let lastTs = 0;
+function loop(ts = 0) {
+  if (paused) return;
+  animId = requestAnimationFrame(loop);
+  const dt = Math.min((ts - lastTs) / 16.67, 3);
+  lastTs = ts;
+
+  update(dt);
+  render();
+}
+
+function update(dt) {
+  game.t++;
+
+  // regen
+  const regen = getUpgVal('regen', 0, 0.5);
+  if (regen > 0) {
+    game.regenAcc += regen / 60;
+    if (game.regenAcc >= 1) {
+      game.hp = Math.min(game.maxHP, game.hp + Math.floor(game.regenAcc));
+      game.regenAcc -= Math.floor(game.regenAcc);
+    }
+  }
+
+  // process clicks → shoot
+  game.clicks.forEach(c => shoot(c.x, c.y));
+  game.clicks = [];
+
+  // spawn girls
+  game.girlSpawnTimer++;
+  if (game.girlSpawnTimer >= game.girlSpawnInterval) {
+    game.girlSpawnTimer = 0;
+    game.girls.push(new Girl(game.H));
+    // ramp up
+    game.girlSpawnInterval = Math.max(80, game.girlSpawnInterval - 4);
+  }
+
+  // update
+  game.projectiles.forEach(p => p.update());
+  game.girls.forEach(g => g.update());
+  game.coins.forEach(c => c.update());
+  game.particles.forEach(p => p.update());
+  game.floats.forEach(f => f.update());
+
+  // collisions: projectile vs girl
+  game.projectiles.forEach(proj => {
+    if (!proj.alive) return;
+    game.girls.forEach(girl => {
+      if (!girl.alive) return;
+      const dx = proj.x - girl.x, dy = proj.y - girl.y;
+      if (Math.hypot(dx, dy) < girl.r + proj.r) {
+        proj.alive = false;
+        const dmg = getUpgVal('damage', 20, 8);
+        girl.hit(dmg);
+        for (let i = 0; i < 6; i++) game.particles.push(new Particle(proj.x, proj.y, '#ff8fa3'));
+        game.score += 10;
+        game.floats.push(new FloatText(proj.x, proj.y, `-${dmg}`, '#ff4d6d'));
+      }
+    });
+  });
+
+  // cleanup
+  game.projectiles = game.projectiles.filter(p => p.alive);
+  game.girls = game.girls.filter(g => g.alive);
+  game.coins = game.coins.filter(c => c.alive);
+  game.particles = game.particles.filter(p => p.alive);
+  game.floats = game.floats.filter(f => f.alive);
+
+  // HUD
+  updateHUD();
+
+  // death check
+  if (game.hp <= 0) {
+    gameOver();
+  }
+}
+
+function shoot(tx, ty) {
+  const W = game.W, H = game.H;
+  const sx = 60, sy = H * 0.5;
+  const extra = save.upgrades.multishot || 0;
+  const count = 1 + Math.floor(extra / 2);
+  for (let i = 0; i < count; i++) {
+    const spread = (i - (count-1)/2) * 0.25;
+    const p = new Projectile(sx, sy, tx, ty);
+    // rotate velocity by spread
+    const cos = Math.cos(spread), sin = Math.sin(spread);
+    const vx2 = p.vx * cos - p.vy * sin;
+    const vy2 = p.vx * sin + p.vy * cos;
+    p.vx = vx2; p.vy = vy2;
+    game.projectiles.push(p);
+  }
+}
+
+function updateHUD() {
+  document.getElementById('hud-hp').textContent = Math.ceil(game.hp);
+  document.getElementById('hud-score').textContent = game.score;
+  document.getElementById('hud-coins').textContent = game.sessionCoins;
+}
+
+function gameOver() {
+  cancelAnimationFrame(animId);
+  if (game.score > save.best) save.best = game.score;
+  persist();
+  const el = document.getElementById('go-score');
+  el.innerHTML = `Счёт: <strong>${game.score}</strong> | Монет: <strong>${game.sessionCoins}</strong>`;
+  document.getElementById('overlay-gameover').hidden = false;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  const W = game.W, H = game.H;
+  ctx.clearRect(0, 0, W, H);
+
+  // background gradient
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#0d0d1a');
+  bg.addColorStop(1, '#0a0a14');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // grid lines
+  ctx.strokeStyle = 'rgba(46,46,85,.35)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 50) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += 50) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // ground
+  ctx.fillStyle = 'rgba(46,46,85,.5)';
+  ctx.fillRect(0, H * 0.62, W, 2);
+
+  // player (phone launcher)
+  ctx.save();
+  ctx.translate(60, H * 0.5);
+  const bobY = Math.sin(game.t * 0.1) * 4;
+  ctx.translate(0, bobY);
+  ctx.font = '56px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🤳', 0, 0);
+  ctx.restore();
+
+  // player HP bar (bottom left)
+  const pbx = 20, pby = H - 36 - (save.upgrades.regen ? 0 : 0);
+  const pbw = 120, pbh = 10;
+  ctx.fillStyle = 'rgba(0,0,0,.5)';
+  ctx.beginPath(); ctx.roundRect(pbx, pby, pbw, pbh, 5); ctx.fill();
+  const hp = Math.max(0, game.hp / game.maxHP);
+  const hpColor = hp > 0.5 ? '#4cff91' : hp > 0.25 ? '#ffd700' : '#ff4d6d';
+  ctx.fillStyle = hpColor;
+  ctx.beginPath(); ctx.roundRect(pbx, pby, pbw * hp, pbh, 5); ctx.fill();
+
+  // entities
+  game.particles.forEach(p => p.draw());
+  game.coins.forEach(c => c.draw());
+  game.girls.forEach(g => g.draw());
+  game.projectiles.forEach(p => p.draw());
+  game.floats.forEach(f => f.draw());
+}
+
+// ============================================================
+// INIT
+// ============================================================
+updateMenuUI();
+showScreen('menu');
+
+})();
+</script>
+
+</body></html>
